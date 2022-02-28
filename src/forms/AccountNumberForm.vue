@@ -1,8 +1,6 @@
 <template>
-  <div
-    class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
-  >
-    <div class="max-w-md w-full space-y-8">
+  <div class="w-full">
+    <div class="max-w-md w-full space-y-8 m-auto">
       <div>
         <h1 class="p-12 text-center text-6xl font-extrabold text-black">
           Welcome to Switch Link
@@ -11,7 +9,7 @@
           Sign in to your account
         </h2>
       </div>
-      <form class="mt-8 space-y-6" action="#" method="POST">
+      <form class="mt-8 space-y-6" @submit.prevent="onSubmit">
         <input type="hidden" name="remember" value="true" />
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
@@ -21,21 +19,16 @@
               name="account-number"
               type="number"
               required
+              v-model="credentials.accountNumber"
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               placeholder="Account Number"
             />
-          </div>
-          <div>
-            <label for="password" class="sr-only">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Pin"
-            />
+            <div
+              v-if="error.errors.accountNumber"
+              class="invalid-feedback fw-bolder"
+            >
+              {{ error.errors.accountNumber.toString() }}
+            </div>
           </div>
         </div>
 
@@ -60,10 +53,35 @@
                 />
               </svg>
             </span>
-            Sign in
+            Continue
           </button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, onBeforeUnmount } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../store/useAuth";
+import { useErrorStore } from "../store/useError";
+
+const credentials = ref({});
+const loading = ref(false);
+const router = useRouter();
+const error = useErrorStore();
+
+const onSubmit = () => {
+  console.log("Submit is working: ", credentials);
+  loading.value = !loading.value;
+  useAuthStore()
+    .accountLogin(credentials.value)
+    .then((res) => {
+      console.log("Res is: ", res);
+      return router.push({ name: "pin" });
+    })
+    .catch(() => (loading.value = !loading.value));
+};
+onBeforeUnmount(() => error.$reset());
+</script>

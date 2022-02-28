@@ -1,16 +1,11 @@
-<script setup>
-import { RouterLink, RouterView } from "vue-router";
-import Header from "./components/Header.vue";
-</script>
-
 <template>
-  <!-- <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header> -->
-  <RouterView />
+  <transition name="layout" mode="out-in">
+    <component :is="$route.meta.layout ?? 'default'">
+      <router-view v-slot="{ Component }">
+        <transition name="route" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </component>
+  </transition>
 </template>

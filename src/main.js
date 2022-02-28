@@ -1,10 +1,22 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import router from "./router";
 import "./index.css";
 
-const app = createApp(App);
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import App from "./App.vue";
+import router from "./router";
+import axios from "./plugins/axios";
+import auth from "./plugins/auth";
+import VueAxios from "vue-axios";
 
-app.use(router);
+//import layouts
+import defaultLayout from "./layouts/default.vue";
+import loggedInLayout from "./layouts/loggedIn.vue";
 
-app.mount("#app");
+createApp(App)
+  .use(createPinia())
+  .use(auth)
+  .use(router)
+  .use(VueAxios, axios)
+  .component("default", defaultLayout)
+  .component("loggedIn", loggedInLayout)
+  .mount("#app");
